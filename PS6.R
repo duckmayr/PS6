@@ -1,5 +1,6 @@
 sg.int <- function(g, ..., lower, upper, dimensions){
   require("SparseGrid")
+  require('parallel')
   
   lower <- floor(lower)
   upper <- ceiling(upper)
@@ -20,7 +21,10 @@ sg.int <- function(g, ..., lower, upper, dimensions){
     weights <- c(weights, sp.grid$weights)
   }
   
-  gx.sp <- apply(nodes, 1, g, ...)
+  clus <- makeCluster(max(detectCores() - 1, 1))
+  gx.sp <- parApply(cl=clus, X=nodes, MARGIN=1, FUN=g, ...)
   val.sp <- gx.sp %*% weights
-  val.sp
+  stopCluster(clus)
+  
+  return(val.sp)
 }
