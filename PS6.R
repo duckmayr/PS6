@@ -85,3 +85,18 @@ expect_error(sg.int(mySine, lower=rep(0, 3), upper=rep(9, 3), dimensions='3', pa
              "wrong sign in 'by' argument")
 expect_error(sg.int(mySine, lower=rep(9, 3), upper=rep(0, 3), dimensions=3, parallel=FALSE),
              "lower must be smaller than upper")
+
+## Compare speed with parallel:
+
+library(microbenchmark)
+microbenchmark(sg.int(mySine, lower=rep(0, 3), upper=rep(9, 3), dimensions=3, parallel=FALSE),
+               sg.int(mySine, lower=rep(0, 3), upper=rep(9, 3), dimensions=3, parallel=TRUE))
+# For my computer, it was worse, but I only have one core
+
+## Compare speed with adaptIntegrate:
+
+library(cubature)
+microbenchmark(sg.int(mySine, lower=rep(0, 2), upper=rep(9, 2), dimensions=2, parallel=FALSE),
+               adaptIntegrate(mySine, rep(0, 2), rep(9, 2)))
+# sg.int is about twice as fast
+
